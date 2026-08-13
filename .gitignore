@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment variables (contains secrets - never upload this!)
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Archive folders
+archive/
+archive (1)/
+
+# Large dataset files
+gym dataset/
+Indian Food Images/
+
+# Large video files (too large for GitHub)
+*.mp4
+*.mov
+*.avi
+public/videos/
+project/public/videos/
+
+# Temporary files
+*.tmp
