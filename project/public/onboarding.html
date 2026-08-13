@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Your Journey - FitTrack</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .wizard-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            margin-bottom: 24px;
+            color: var(--secondary);
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .option-grid {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .option-card:hover,
+        .option-card.selected {
+            background: rgba(var(--primary-rgb), 0.1);
+            border-color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+        }
+
+        .btn-back {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wizard-container">
+        <div class="progress-bar" id="progressBar"></div>
+
+        <!-- Step 1: Goal -->
+        <div class="step active" id="step1">
+            <h2>What is your primary goal?</h2>
+            <div class="option-grid">
+                <div class="option-card" onclick="selectOption('goal', 'Lose Weight')">
+                    <span>Lose Weight</span>
+                    <span>🔥</span>
+                </div>
+                <div class="option-card" onclick="selectOption('goal', 'Maintain Weight')">
+                    <span>Maintain Weight</span>
+                    <span>⚖️</span>
+                </div>
+                <div class="option-card" onclick="selectOption('goal', 'Gain Muscle')">
+                    <span>Gain Muscle</span>
+                    <span>💪</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Activity Level -->
+        <div class="step" id="step2">
+            <h2>How active are you?</h2>
+            <div class="option-grid">
+                <div class="option-card" onclick="selectOption('activityLevel', 'Not Very Active')">
+                    <div>
+                        <div>Not Very Active</div>
+                        <small style="color: grey;">Spend most of the day sitting</small>
+                    </div>
+                </div>
+                <div class="option-card" onclick="selectOption('activityLevel', 'Lightly Active')">
+                    <div>
+                        <div>Lightly Active</div>
+                        <small style="color: grey;">Spend a good part of the day on your feet</small>
+                    </div>
+                </div>
+                <div class="option-card" onclick="selectOption('activityLevel', 'Active')">
+                    <div>
+                        <div>Active</div>
+                        <small style="color: grey;">Spend a good part of the day doing physical activity</small>
+                    </div>
+                </div>
+                <div class="option-card" onclick="selectOption('activityLevel', 'Very Active')">
+                    <div>
+                        <div>Very Active</div>
+                        <small style="color: grey;">Spend most of the day doing heavy physical activity</small>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-secondary btn-back" onclick="prevStep(1)">Back</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Global Data (Gender, DOB, Location) -->
+        <div class="step" id="step3">
+            <h2>Tell us about yourself</h2>
+            <form onsubmit="event.preventDefault(); nextStep(4)">
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="dob" required>
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <input type="text" id="country" placeholder="e.g. United States" required>
+                </div>
+                <div class="form-group">
+                    <label>Zip/Suburbs</label>
+                    <input type="text" id="zip" placeholder="e.g. 90210" required>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-secondary btn-back" onclick="prevStep(2)">Back</button>
+                    <button type="submit" class="btn-primary">Next</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 4: Measurements -->
+        <div class="step" id="step4">
+            <h2>Your Measurements</h2>
+            <form onsubmit="event.preventDefault(); nextStep(5)">
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" id="height" placeholder="e.g. 175" required>
+                </div>
+                <div class="form-group">
+                    <label>Current Weight (kg)</label>
+                    <input type="number" id="weight" placeholder="e.g. 70" required>
+                </div>
+                <div class="form-group">
+                    <label>Goal Weight (kg)</label>
+                    <input type="number" id="goalWeight" placeholder="e.g. 65" required>
+                </div>
+                <div class="form-group">
+                    <label>Weekly Goal</label>
+                    <select id="weeklyGoal" required>
+                        <option value="Lose 0.25 kg per week">Lose 0.25 kg per week</option>
+                        <option value="Lose 0.5 kg per week">Lose 0.5 kg per week</option>
+                        <option value="Lose 1 kg per week">Lose 1 kg per week</option>
+                        <option value="Maintain my current weight">Maintain my current weight</option>
+                        <option value="Gain 0.25 kg per week">Gain 0.25 kg per week</option>
+                        <option value="Gain 0.5 kg per week">Gain 0.5 kg per week</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-secondary btn-back" onclick="prevStep(3)">Back</button>
+                    <button type="submit" class="btn-primary">Next</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 5: Account Creation -->
+        <div class="step" id="step5">
+            <h2>Create Your Account</h2>
+            <form id="finalRegisterForm" onsubmit="event.preventDefault(); submitRegistration()">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-secondary btn-back" onclick="prevStep(4)">Back</button>
+                    <button type="submit" class="btn-primary">Start My Journey</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let formData = {
+            goal: '',
+            activityLevel: ''
+        };
+        const totalSteps = 5;
+
+        function updateProgress(step) {
+            const progress = (step / totalSteps) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        function showStep(stepId) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step${stepId}`).classList.add('active');
+            updateProgress(stepId);
+        }
+
+        function nextStep(stepId) {
+            // Collect data from current step if needed before moving
+            if (stepId === 4) {
+                formData.gender = document.getElementById('gender').value;
+                formData.dob = document.getElementById('dob').value;
+                formData.country = document.getElementById('country').value;
+                formData.zip = document.getElementById('zip').value;
+            }
+            if (stepId === 5) {
+                formData.height = document.getElementById('height').value;
+                formData.weight = document.getElementById('weight').value;
+                formData.goalWeight = document.getElementById('goalWeight').value;
+                formData.weeklyGoal = document.getElementById('weeklyGoal').value;
+            }
+            showStep(stepId);
+        }
+
+        function prevStep(stepId) {
+            showStep(stepId);
+        }
+
+        function selectOption(key, value) {
+            formData[key] = value;
+            // Auto advance for simple card selections
+            const currentStep = document.querySelector('.step.active');
+            const nextStepId = parseInt(currentStep.id.replace('step', '')) + 1;
+            showStep(nextStepId);
+        }
+
+        async function submitRegistration() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            const payload = {
+                username,
+                email,
+                password,
+                metrics: {
+                    goal: formData.goal,
+                    activityLevel: formData.activityLevel,
+                    gender: formData.gender,
+                    dob: formData.dob,
+                    height: parseFloat(formData.height),
+                    weight: parseFloat(formData.weight),
+                    goalWeight: parseFloat(formData.goalWeight),
+                    weeklyGoal: formData.weeklyGoal,
+                    // Adding dummy defaults for now as they weren't in the wizard yet
+                    dietaryPreferences: [],
+                    obstacles: []
+                },
+                location: {
+                    country: formData.country,
+                    zip: formData.zip
+                }
+            };
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Save token
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert(data.msg || 'Registration failed');
+                }
+            } catch (err) {
+                alert('Error connecting to server');
+                console.error(err);
+            }
+        }
+
+        // Initialize
+        updateProgress(1);
+    </script>
+
+</body>
+
+</html>
