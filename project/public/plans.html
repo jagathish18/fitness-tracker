@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Plans - FitTrack</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .plan-card {
+            background: rgba(30, 41, 59, 0.6);
+            /* Slate glass */
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.15);
+            /* Neon glow */
+            border-color: var(--primary);
+        }
+
+        .timeline-item {
+            background: var(--bg-panel);
+            border-left: 4px solid var(--primary);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: var(--card-shadow);
+            animation: fadeIn 0.5s ease-out;
+            border: 1px solid #334155;
+            /* Slate border */
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>FitTrack</h2>
+            <div class="nav-links">
+                <a href="dashboard.html">Home Feed</a>
+                <a href="tracker.html">My Workouts</a>
+                <a href="analysis.html">AI Nutrition Scan</a>
+                <a href="plans.html" class="active">Training Plans</a>
+                <!-- Routine link removed -->
+                <a href="#" onclick="logout()" style="margin-top: 20px; color: #ff5252;">Logout</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1 style="margin-bottom: 10px;">Long-term Plans</h1>
+            <p style="color: var(--text-dim); margin-bottom: 40px;">Select your primary goal to see your 1-Year Roadmap.
+            </p>
+
+            <!-- Goal Selection -->
+            <div id="goal-selection" class="stats-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div class="plan-card" onclick="loadPlan('lose-weight')" style="border-color: var(--secondary);">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 15px;">🔥 Lose Weight</h2>
+                    <p style="color: var(--text-muted); font-size: 1.1rem;">High-intensity cardio & fat burning focus.
+                    </p>
+                    <div
+                        style="margin-top: 20px; color: var(--secondary); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Select Plan &rarr;</div>
+                </div>
+                <div class="plan-card" onclick="loadPlan('gain-muscle')" style="border-color: var(--primary);">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 15px;">💪 Gain Muscle</h2>
+                    <p style="color: var(--text-muted); font-size: 1.1rem;">Hypertrophy, strength & volume focus.</p>
+                    <div
+                        style="margin-top: 20px; color: var(--primary); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Select Plan &rarr;</div>
+                </div>
+            </div>
+
+            <!-- Plan Display -->
+            <div id="plan-display" style="display: none; margin-top: 40px;">
+                <button onclick="resetView()" class="btn-secondary"
+                    style="margin-bottom: 30px; display: flex; align-items: center; gap: 8px; padding: 10px 20px; width: fit-content;">
+                    <span style="font-size: 1.2rem;">&larr;</span> Back to Goals
+                </button>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 40px;">
+                    <div>
+                        <h2 id="plan-title" style="margin-bottom: 30px; font-size: 2rem; color: var(--text-main);"></h2>
+                        <div id="timeline-container">
+                            <!-- Phases go here -->
+                        </div>
+                    </div>
+
+                    <!-- [NEW] Community Insights Sidebar -->
+                    <div class="insights-sidebar"
+                        style="background: var(--bg-panel); padding: 25px; border-radius: 12px; height: fit-content; border: 1px solid var(--glass-border); box-shadow: var(--card-shadow);">
+                        <h3
+                            style="margin-bottom: 20px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; color: var(--primary);">
+                            📊 Community Insights
+                        </h3>
+
+                        <div style="margin-bottom: 25px;">
+                            <h4
+                                style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Top
+                                Motivations</h4>
+                            <div id="motivations-list">Loading...</div>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <h4
+                                style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Common
+                                Barriers</h4>
+                            <div id="barriers-list">Loading...</div>
+                        </div>
+
+                        <div>
+                            <h4
+                                style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Popular
+                                Activities</h4>
+                            <div id="activities-list">Loading...</div>
+                        </div>
+
+                        <div
+                            style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--glass-border); font-size: 0.8rem; color: var(--text-dim); text-align: center;">
+                            Based on data from <span id="total-respondents"
+                                style="color: var(--text-main); font-weight: 700;">0</span> active members.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = 'index.html';
+
+        async function loadPlan(goal) {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_URL}/plans/${goal}`, {
+                    headers: { 'x-auth-token': token }
+                });
+                const plan = await res.json();
+
+                document.getElementById('goal-selection').style.display = 'none';
+                document.getElementById('plan-display').style.display = 'block';
+                document.getElementById('plan-title').innerHTML = `
+                    ${plan.title} 
+                    ${plan.badge ? `<span style="background: linear-gradient(135deg, #00C853, #64DD17); color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; vertical-align: middle; margin-left: 10px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,200,83,0.3);">${plan.badge}</span>` : ''}
+                `;
+
+                const container = document.getElementById('timeline-container');
+                container.innerHTML = '';
+
+                plan.phases.forEach((phase, index) => {
+                    const html = `
+                        <div class="timeline-item" style="animation-delay: ${index * 0.2}s">
+                            <h3 style="color: var(--primary); font-size: 1.5rem; margin-bottom: 8px; font-weight: 800; letter-spacing: 0.5px;">${phase.title}</h3>
+                            <p style="color: var(--secondary); font-weight: 700; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px;">Focus: ${phase.focus}</p>
+                            <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; font-size: 1rem;">${phase.desc}</p>
+                            
+                            <div style="margin-bottom: 20px;">
+                                <h4 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 16px; border-bottom: 1px solid var(--glass-border); padding-bottom: 8px;">📋 Workout Routine</h4>
+                                ${phase.steps.map(ex => `
+                                    <div onclick="const d = this.querySelector('.desc'); d.style.display = d.style.display === 'none' ? 'block' : 'none'; this.style.borderColor = d.style.display === 'block' ? 'var(--primary)' : 'var(--glass-border)';" 
+                                         style="background: rgba(15, 23, 42, 0.6); padding: 18px; border-radius: 10px; margin-bottom: 12px; cursor: pointer; border: 1px solid var(--glass-border); transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div>
+                                                <h5 style="color: var(--text-main); margin: 0; font-size: 1.1rem; font-weight: 600;">${ex.title || ex}</h5>
+                                                <small style="color: var(--primary); font-weight: 600; font-size: 0.9rem;">${ex.sets ? `${ex.sets} x ${ex.reps}` : 'Click for details'}</small>
+                                            </div>
+                                            <span style="background: rgba(77, 115, 255, 0.15); padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; color: #8FAAFF; border: 1px solid rgba(77, 115, 255, 0.3); font-weight: 600;">${ex.level || 'General'}</span>
+                                        </div>
+                                        <div class="desc" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--glass-border); color: var(--text-muted); font-size: 0.95rem; line-height: 1.7;">
+                                            <p style="margin-bottom: 15px;">${ex.desc || 'No detailed instructions available.'}</p>
+                                            <div style="font-size: 0.9rem; color: var(--text-dim); display: flex; gap: 24px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+                                                <span>🏋️ Equipment: <span style="color: var(--text-main); font-weight: 600;">${ex.equipment || 'None'}</span></span>
+                                                <span>⭐ Rating: <span style="color: #FFD700; font-weight: 600;">${ex.rating ? ex.rating.toFixed(1) : 'N/A'}</span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div style="background: rgba(0, 212, 255, 0.05); padding: 15px; border-radius: 8px; border-left: 4px solid var(--primary);">
+                                <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 4px; font-weight: 700; text-transform: uppercase;">🥗 Nutrition Focus</h4>
+                                <p style="font-size: 0.95rem; color: var(--text-main); margin: 0;">${phase.nutrition}</p>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+
+                // [NEW] Load Community Insights
+                loadInsights();
+
+            } catch (err) {
+                console.error(err);
+                alert('Failed to load plan');
+            }
+        }
+
+        async function loadInsights() {
+            try {
+                const res = await fetch(`${API_URL}/insights`, {
+                    headers: { 'x-auth-token': localStorage.getItem('token') }
+                });
+                const data = await res.json();
+
+                if (data.error) return;
+
+                document.getElementById('total-respondents').innerText = data.totalRespondents;
+
+                const createList = (items) => items.map(i =>
+                    `<div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem;">
+                        <span style="color: var(--text-main);">${i.label}</span>
+                        <span style="color: var(--primary); font-weight: bold;">${i.count}</span>
+                    </div>`
+                ).join('');
+
+                document.getElementById('motivations-list').innerHTML = createList(data.motivations);
+                document.getElementById('barriers-list').innerHTML = createList(data.barriers);
+                document.getElementById('activities-list').innerHTML = createList(data.popularForms);
+
+            } catch (err) {
+                console.error("Failed to load insights", err);
+            }
+        }
+
+        function resetView() {
+            document.getElementById('goal-selection').style.display = 'grid';
+            document.getElementById('plan-display').style.display = 'none';
+            // Stop videos by clearing html
+            document.getElementById('timeline-container').innerHTML = '';
+        }
+    </script>
+</body>
+
+</html>
