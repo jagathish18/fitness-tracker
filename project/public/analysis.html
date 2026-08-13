@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis - FitTrack</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>FitTrack</h2>
+            <div class="nav-links">
+                <a href="dashboard.html">Home Feed</a>
+                <a href="tracker.html">My Workouts</a>
+                <a href="analysis.html" class="active">AI Nutrition Scan</a>
+                <a href="plans.html">Training Plans</a>
+                <!-- Routine link removed -->
+                <a href="#" onclick="logout()" style="margin-top: 20px; color: #ff5252;">Logout</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1 style="margin-bottom: 20px;">AI Food Analysis</h1>
+
+            <div class="chart-container" style="text-align: center; padding: 40px; margin-bottom: 30px;">
+                <div id="drop-zone"
+                    style="border: 2px dashed var(--glass-border); padding: 40px; border-radius: 20px; transition: 0.3s; cursor: pointer;">
+                    <p style="font-size: 1.2rem; color: var(--text-muted);">Drag & Drop Food Image or Click to Upload
+                    </p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                <button id="scanBtn" class="btn-primary"
+                    style="max-width: 200px; display: none; margin: 20px auto;">Scan Food</button>
+            </div>
+
+            <!-- Loading Animation -->
+            <div id="scanning-anim" style="display: none; text-align: center; margin: 30px;">
+                <h2 style="color: var(--secondary); animation: float 1s infinite;">Analyzing...</h2>
+            </div>
+
+            <!-- Results -->
+            <div id="results-area" style="display: none; animation: fadeIn 0.5s ease-out;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3 id="res-food">Unknown</h3>
+                        <p>Detected Food</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="res-cal">0</h3>
+                        <p>Estimated Calories</p>
+                    </div>
+                </div>
+
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h2>Macros</h2>
+                        <ul style="list-style: none; color: var(--text-dim); padding: 0;">
+                            <li style="margin: 10px 0;">Protein: <span id="res-prot"
+                                    style="color: white; font-weight: bold;">0g</span></li>
+                            <li style="margin: 10px 0;">Carbs: <span id="res-carb"
+                                    style="color: white; font-weight: bold;">0g</span></li>
+                            <li style="margin: 10px 0;">Fats: <span id="res-fat"
+                                    style="color: white; font-weight: bold;">0g</span></li>
+                        </ul>
+                    </div>
+                    <div class="chart-container"
+                        style="background: rgba(41, 121, 255, 0.1); border-color: var(--secondary-color);">
+                        <h2 style="color: var(--secondary-color);">Workout Recommendation</h2>
+                        <p id="res-workout" style="font-size: 1.1rem; color: white; margin-bottom: 20px;">Try 30 mins
+                            running.</p>
+
+                        <div style="text-align: center; margin-top: 20px;">
+                            <i class="fas fa-dumbbell"
+                                style="font-size: 3rem; color: var(--secondary-color); opacity: 0.5;"></i>
+                        </div>
+
+                        <button onclick="logRecommendedWorkout()" class="btn-secondary" style="margin-top: 20px;">Log
+                            This Workout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        if (!localStorage.getItem('token')) window.location.href = 'index.html';
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('fileInput');
+        const scanBtn = document.getElementById('scanBtn');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) {
+                dropZone.innerHTML = `<p style="color: var(--primary-color);">${fileInput.files[0].name} selected</p>`;
+                scanBtn.style.display = 'block';
+            }
+        });
+
+        scanBtn.addEventListener('click', performScan);
+
+        async function performScan() {
+            document.getElementById('scanning-anim').style.display = 'block';
+            document.getElementById('results-area').style.display = 'none';
+
+            // Simulating API latency
+            setTimeout(async () => {
+                const token = localStorage.getItem('token');
+                try {
+                    // Send FormData for accurate analysis
+                    const formData = new FormData();
+                    if (fileInput.files[0]) {
+                        formData.append('image', fileInput.files[0]);
+                        formData.append('imageName', fileInput.files[0].name);
+                    } else {
+                        // Fallback for no file
+                        formData.append('imageName', "food.jpg");
+                    }
+
+                    const res = await fetch(`${API_URL}/ai-analyze`, {
+                        method: 'POST',
+                        headers: {
+                            // 'Content-Type': 'multipart/form-data', // Skip this, fetch sets it automatically
+                            'x-auth-token': token
+                        },
+                        body: formData
+                    });
+                    const data = await res.json();
+
+                    document.getElementById('scanning-anim').style.display = 'none';
+                    document.getElementById('results-area').style.display = 'block';
+
+                    document.getElementById('res-food').innerText = data.foodName;
+                    document.getElementById('res-cal').innerText = data.calories;
+                    document.getElementById('res-prot').innerText = data.macros.protein + 'g';
+                    document.getElementById('res-carb').innerText = data.macros.carbs + 'g';
+                    document.getElementById('res-fat').innerText = data.macros.fats + 'g';
+                    document.getElementById('res-workout').innerText = data.workoutRecommendation;
+
+                    // Video Removed
+                    // if (data.videoUrl) {
+                    //     document.getElementById('res-video').src = data.videoUrl;
+                    // }
+
+                    // Store for "Log This Workout" button (simple implementation)
+                    window.lastRecommendation = data.fullWorkout;
+
+                } catch (e) {
+                    console.error(e);
+                    alert("Analysis Failed");
+                    document.getElementById('scanning-anim').style.display = 'none';
+                }
+            }, 2000);
+        }
+
+        async function logRecommendedWorkout() {
+            if (window.lastRecommendation) {
+                const token = localStorage.getItem('token');
+                console.log("Logging", window.lastRecommendation);
+                // Call API to log workout
+                const res = await fetch(`${API_URL}/workouts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                    body: JSON.stringify(window.lastRecommendation)
+                });
+                if (res.ok) alert('Workout Added to Dashboard!');
+            }
+        }
+    </script>
+</body>
+
+</html>
